@@ -70,4 +70,4 @@
 
 ## 迭代交互参考
 
-磁性噪声圆环参考 Codrops Custom Cursors Demo 4：https://tympanus.net/Tutorials/CustomCursors/index4.html 。保留八节点平滑轮廓、缓动、磁性与噪声行为，以原生 SVG 实现。SimplexNoise 2.4.0 来自 cdnjs，并保存在 assets/vendor/simplex-noise.min.js。Hero 已移除 WebGL 图像扭曲。
+全页光标使用原生 SVG 红圈与白色十字准星，requestAnimationFrame 平滑跟随。评分区保持精准点选；旧噪声库和吸附代码已移除。Hero 无 WebGL 图像扭曲。

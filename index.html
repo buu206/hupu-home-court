@@ -9,7 +9,6 @@
   <link rel="preload" as="font" href="assets/fonts/anton.ttf" type="font/ttf" crossorigin>
   <link rel="stylesheet" href="styles.css">
   <script defer src="assets/vendor/gsap.min.js"></script><script defer src="assets/vendor/ScrollTrigger.min.js"></script><script defer src="assets/vendor/lenis.min.js"></script>
-  <script defer src="assets/vendor/simplex-noise.min.js"></script>
   <script defer src="data.js"></script><script defer src="app.js"></script>
 </head>
 <body>
@@ -19,7 +18,7 @@
     <div class="loader-bottom"><span>主场加载中</span><div class="load-track"><i></i></div><span class="load-number">00<span>%</span></span><button id="skip-loader">跳过开场 ↗</button></div>
   </div>
   <div class="page-progress" aria-hidden="true"></div>
-  <div class="cursor" aria-hidden="true"><svg viewBox="0 0 160 160"><path class="cursor-ring" d="M95 80A15 15 0 1 1 65 80A15 15 0 1 1 95 80Z"/></svg><span class="cursor-label"></span></div>
+  <div class="cursor" aria-hidden="true"><svg viewBox="0 0 40 40"><circle class="cursor-ring" cx="20" cy="20" r="16"/><path class="cursor-cross" d="M15 20H25M20 15V25"/></svg><span class="cursor-label"></span></div>
   <svg class="archive-defs" aria-hidden="true"><defs><clipPath id="archive-shape" clipPathUnits="objectBoundingBox"><path d="M.044 .009H.956Q.991 .009 .991 .037V.851Q.991 .882 .956 .882H.755Q.714 .882 .694 .912L.654 .963Q.635 .991 .595 .991H.044Q.009 .991 .009 .963V.037Q.009 .009 .044 .009Z"/></clipPath></defs></svg>
   <div class="grain" aria-hidden="true"></div>
   <header class="header">
@@ -38,7 +37,7 @@
         <div class="hero-left"><span class="cross">✳</span><p>Some call it a game.<br>We call it <em>everything.</em></p><span class="mono muted">一场比赛，一群同路人。</span></div>
         <a href="#games" class="next-game" aria-label="为湖人对勇士的演示比赛评分"><span class="mono">FEATURED GAME <i>↗</i></span><div><img src="assets/teams/lal.svg" alt="湖人"><span>VS</span><img src="assets/teams/gsw.svg" alt="勇士"></div><span class="next-score">112 <i>—</i> 108</span><small>湖人 × 勇士 · 经典对阵演示</small><b>为本场球员评分 ↗</b></a>
         <span class="hero-script serif" aria-hidden="true">More than a game.</span>
-        <div class="hero-bottom mono"><a href="#moments" class="scroll-cue">向下滚动，进入主场 <span>↓</span></a><span class="mouse-cue">移动鼠标 · 感受赛场引力 <i>↔</i></span><span>SPORTS. CULTURE. COMMUNITY.</span></div>
+        <div class="hero-bottom mono"><a href="#moments" class="scroll-cue">向下滚动，进入主场 <span>↓</span></a><span class="mouse-cue">移动鼠标 · 跟随你的热爱 <i>↔</i></span><span>SPORTS. CULTURE. COMMUNITY.</span></div>
         <div class="brand-reveal" aria-hidden="true"><p class="mono">ONE GAME. MILLIONS OF VOICES.</p><div class="logo-lockup"><img class="nba-lockup" src="assets/nba.svg" alt=""><span class="collab-x">×</span><img class="hupu-lockup" src="assets/hupu-logo-red.svg" alt=""></div><h2>THIS IS<br><span class="serif">our game.</span></h2><span class="mono">无热爱，不虎扑。 / TOGETHER, WE MAKE THE GAME.</span></div>
         <span class="hero-scene mono" aria-hidden="true">01 <i>/</i> 03</span>
       </div>

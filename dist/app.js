@@ -1,4 +1,4 @@
-/* HUPU HOME COURT — orchestration, local community interactions and magnetic cursor. */
+/* HUPU HOME COURT — orchestration, local community interactions and a precision crosshair cursor. */
 (() => {
   'use strict';
   const $ = (s,root=document) => root.querySelector(s);
@@ -21,7 +21,7 @@
 
   // Buttons stay in the current document; dialogs are scroll-isolated.
   const dialog=$('#detail-dialog');
-  function openDialog(content){$('#dialog-content').innerHTML=content;dialog.showModal();if(document.body.classList.contains('magnetic-cursor'))dialog.append($('.cursor'));document.body.classList.add('dialog-open');lenis?.stop();dialog.scrollTop=0;}
+  function openDialog(content){$('#dialog-content').innerHTML=content;dialog.showModal();if(document.body.classList.contains('crosshair-cursor'))dialog.append($('.cursor'));document.body.classList.add('dialog-open');lenis?.stop();dialog.scrollTop=0;}
   function closeDialog(){dialog.close();}
   dialog.addEventListener('close',()=>{document.body.append($('.cursor'));document.body.classList.remove('dialog-open');lenis?.start();});
   $('.dialog-close').addEventListener('click',closeDialog);
@@ -32,8 +32,8 @@
     const teams=D.teams.filter(t=>conference==='all'||t.conference===conference);
     const columns=Array.from({length:Math.min(4,teams.length)},()=>[]);
     teams.forEach((t,i)=>columns[i%columns.length].push(t));
-    $('#jersey-grid').innerHTML=columns.map((items,i)=>`<div class="jersey-column" data-column="${i}">${items.map(t=>`
-      <button class="jersey-card" data-team="${t.id}" aria-label="查看${t.cn}球衣与球队档案">
+    $('#jersey-grid').innerHTML=columns.map((items,i)=>`<div class="jersey-column" data-column="${i}">${items.map((t,j)=>`
+      <div class="jersey-slot" data-wave="${(i+j)%2===0?'up':'down'}" style="--wave-offset:${(i+j)%2===0?-50:50}px"><button class="jersey-card" data-team="${t.id}" aria-label="查看${t.cn}球衣与球队档案">
         <span class="archive-back" aria-hidden="true"></span>
         <span class="archive-tab mono">${t.conference==='west'?'WEST':'EAST'} / THE ARCHIVE</span>
         <div class="jersey-folder">
@@ -46,7 +46,7 @@
         </div>
         <svg class="archive-outline" viewBox="0 0 320 390" preserveAspectRatio="none" aria-hidden="true"><path d="M14 3.5H306Q317 3.5 317 14.5V332Q317 344 306 344H242Q228 344 222 356L209 376Q203 386.5 190 386.5H14Q3 386.5 3 375V14.5Q3 3.5 14 3.5Z"/></svg>
         <span class="archive-number mono">NO. ${t.number} <i>↗</i></span>
-      </button>`).join('')}</div>`).join('');
+      </button></div>`).join('')}</div>`).join('');
     $$('.jersey-card').forEach(el=>{el.addEventListener('click',()=>openTeam(el.dataset.team));addTilt(el,3);});
     if(hasGSAP&&!reduced)gsap.fromTo('.jersey-card',{opacity:0,y:35},{opacity:1,y:0,duration:.65,stagger:.035,overwrite:true,clearProps:'transform'});
     refresh();
@@ -70,23 +70,98 @@
   function validRating(key){const n=Number(ratings[key]);return Number.isInteger(n)&&n>=1&&n<=5?n:0;}
   function openMatch(id){selectedMatch=D.matches.find(m=>m.id===id);$$('.match-card').forEach(b=>{const active=b.dataset.match===id;b.classList.toggle('selected',active);b.setAttribute('aria-expanded',String(active));});const panel=$('#players-panel');panel.hidden=false;$('#selected-game').textContent=`${team(selectedMatch.home).cn} × ${team(selectedMatch.away).cn}`;
     $('#player-grid').innerHTML=selectedMatch.players.map(pid=>{const p=D.players[pid];const key=`${id}:${pid}`;const value=validRating(key);return `<article class="player-card" data-player="${pid}" data-rating="${value}" style="--team-color:${p.color}"><span class="player-number" aria-hidden="true">${p.no}</span><div class="rating-stars" role="group" aria-label="为${p.name}评分">${[1,2,3,4,5].map(n=>`<button type="button" data-star="${n}" class="${n<=value?'lit':''}" aria-label="为${p.name}评${n}星" aria-pressed="${n===value}" title="${n}星 / ${n*2}分">★</button>`).join('')}</div><div class="player-status ${value?'rated':''}" aria-live="polite">${value?`✓ 已评分 ${value} 星 · ${value*2}.0 分`:'悬停亮星 · 点击评分'}</div><img class="player-photo" src="assets/${p.photo}.png" alt="${p.name}官方头像"><div class="player-info"><h4 class="player-en">${p.en}</h4><span class="community-rating">${p.score}<small>JR 演示评分</small></span><p>${p.name} / NO.${p.no}</p><div class="player-stats">${p.stats.map((n,i)=>`<span>${n}<small>${['得分','篮板','助攻'][i]}</small></span>`).join('')}</div><button class="edit-rating" type="button">${value?'修改评分 ↗':'点击上方星星评分 ↑'}</button></div><span class="card-shine"></span></article>`;}).join('');
-    $$('.player-card').forEach(card=>{const stars=$('.rating-stars',card);const buttons=$$('button[data-star]',card);const reset=()=>{const active=document.activeElement;previewStars(card,stars.contains(active)&&active.dataset.star?Number(active.dataset.star):Number(card.dataset.rating));};stars.addEventListener('pointermove',e=>{const first=buttons[0].getBoundingClientRect(),last=buttons[4].getBoundingClientRect();const n=Math.max(1,Math.min(5,Math.ceil((e.clientX-first.left)/(last.right-first.left)*5)));previewStars(card,n);});stars.addEventListener('pointerleave',reset);buttons.forEach(b=>{b.addEventListener('pointerenter',()=>previewStars(card,Number(b.dataset.star)));b.addEventListener('focus',()=>previewStars(card,Number(b.dataset.star)));b.addEventListener('blur',reset);b.addEventListener('click',e=>ratePlayer(card,Number(b.dataset.star),e));b.addEventListener('keydown',e=>{if(e.key==='ArrowRight'||e.key==='ArrowLeft'){e.preventDefault();const index=buttons.indexOf(b);buttons[Math.max(0,Math.min(4,index+(e.key==='ArrowRight'?1:-1)))].focus();}});});$('.edit-rating',card).addEventListener('click',()=>{stars.classList.add('editing');buttons[Math.max(0,Number(card.dataset.rating)-1)].focus();toast('选择新的星数，点击即可改分');});addTilt(card,5);});
+    $$('.player-card').forEach(card=>{
+      const stars=$('.rating-stars',card),buttons=$$('[data-star]',stars);
+      let pointerInside=false,hoverRating=0;
+      const reset=()=>{
+        const active=document.activeElement;
+        previewStars(card,pointerInside?hoverRating:stars.contains(active)&&active.dataset.star?Number(active.dataset.star):Number(card.dataset.rating));
+      };
+      const preview=e=>{
+        pointerInside=true;
+        const box=stars.getBoundingClientRect(),unit=box.width/5;
+        const local=Math.max(0,Math.min(box.width-.01,e.clientX-box.left));
+        let next=Math.min(5,Math.floor(local/unit)+1);
+        // A 3px boundary buffer avoids flickering while sliding between stars.
+        if(hoverRating&&Math.abs(next-hoverRating)===1){
+          const boundary=Math.min(next,hoverRating)*unit;
+          if(Math.abs(local-boundary)<3)next=hoverRating;
+        }
+        hoverRating=next;stars.dataset.preview=next;previewStars(card,next);
+      };
+      stars.addEventListener('pointerenter',preview);
+      stars.addEventListener('pointermove',preview);
+      stars.addEventListener('pointerleave',()=>{pointerInside=false;hoverRating=0;delete stars.dataset.preview;reset();});
+      buttons.forEach(b=>{
+        b.removeAttribute('title');
+        b.addEventListener('focus',()=>previewStars(card,Number(b.dataset.star)));
+        b.addEventListener('blur',()=>queueMicrotask(reset));
+        b.addEventListener('click',e=>{hoverRating=Number(b.dataset.star);ratePlayer(card,hoverRating,e);});
+        b.addEventListener('keydown',e=>{
+          if(e.key==='ArrowRight'||e.key==='ArrowLeft'){
+            e.preventDefault();const index=buttons.indexOf(b);
+            const next=buttons[Math.max(0,Math.min(4,index+(e.key==='ArrowRight'?1:-1)))];
+            next.focus();previewStars(card,Number(next.dataset.star));
+          }
+        });
+      });
+      $('.edit-rating',card).addEventListener('click',()=>{
+        buttons[Math.max(0,Number(card.dataset.rating)-1)].focus();toast('选择新的星数，点击即可改分');
+      });
+      addTilt(card,5,{pauseOn:'.rating-stars'});
+    });
     updateRatingProgress();refresh();if(hasGSAP&&!reduced){gsap.fromTo(panel,{opacity:0,y:25},{opacity:1,y:0,duration:.45});gsap.fromTo('.player-card',{y:65,rotationY:-12,rotationZ:i=>(i-1.5)*3,opacity:0},{y:0,rotationY:0,rotationZ:0,opacity:1,duration:.8,stagger:.07,ease:'power3.out',clearProps:'transform'});}requestAnimationFrame(()=>{goTo('#players-panel',110);});}
   function previewStars(card,n){$$('[data-star]',card).forEach(b=>b.classList.toggle('lit',Number(b.dataset.star)<=n));}
-  function ratePlayer(card,n,event){const key=`${selectedMatch.id}:${card.dataset.player}`;const old=validRating(key);ratings[key]=n;const persisted=save('hupu-court-ratings-v2',ratings);card.dataset.rating=n;previewStars(card,n);$$('[data-star]',card).forEach(b=>b.setAttribute('aria-pressed',String(Number(b.dataset.star)===n)));const status=$('.player-status',card);status.textContent=`✓ 已评分 ${n} 星 · ${n*2}.0 分`;status.classList.add('rated');$('.edit-rating',card).textContent='修改评分 ↗';card.classList.remove('confirmed');void card.offsetWidth;card.classList.add('confirmed');setTimeout(()=>card.classList.remove('confirmed'),750);updateRatingProgress();const r=$('.rating-stars',card).getBoundingClientRect();burst(event.clientX||r.left+r.width/2,event.clientY||r.top+r.height/2);toast(`${old?'评分已修改':'评分已确认'}：${D.players[card.dataset.player].name} ${n} 星${persisted?'':'（本次会话有效）'}`);}
+  function ratePlayer(card,n,event){const key=`${selectedMatch.id}:${card.dataset.player}`;const old=validRating(key);ratings[key]=n;const persisted=save('hupu-court-ratings-v2',ratings);card.dataset.rating=n;previewStars(card,n);$$('[data-star]',card).forEach(b=>b.setAttribute('aria-pressed',String(Number(b.dataset.star)===n)));const status=$('.player-status',card);status.textContent=`✓ 已评分 ${n} 星 · ${n*2}.0 分`;status.classList.add('rated');$('.edit-rating',card).textContent='修改评分 ↗';card.classList.remove('confirmed');void card.offsetWidth;card.classList.add('confirmed');setTimeout(()=>card.classList.remove('confirmed'),350);updateRatingProgress();const r=$('.rating-stars',card).getBoundingClientRect();burst(event.clientX||r.left+r.width/2,event.clientY||r.top+r.height/2);toast(`${old?'评分已修改':'评分已确认'}：${D.players[card.dataset.player].name} ${n} 星${persisted?'':'（本次会话有效）'}`);}
   function updateRatingProgress(){const count=selectedMatch.players.filter(id=>validRating(`${selectedMatch.id}:${id}`)).length;$('#rating-progress').textContent=`已评 ${count} / ${selectedMatch.players.length}${count===selectedMatch.players.length?' · 本场评分完成 ✓':''}`;}
   $('.close-panel').addEventListener('click',()=>{$('#players-panel').hidden=true;$$('.match-card').forEach(b=>{b.classList.remove('selected');b.setAttribute('aria-expanded','false');});selectedMatch=null;refresh();goTo('#games');});
 
   // Twenty visual culture marks, real SVGs where supplied; others use wordmarks.
   const logoIds=new Set(['nike','adidas','puma','underarmour','jordan','newbalance','redbull','sony','samsung','xiaomi','playstation','spotify','bilibili','beats','logitech','twitch']);
-  function renderPartners(){$('#partner-grid').innerHTML=D.partners.map(p=>`<button class="partner-logo" aria-label="查看${p.name}文化灵感" data-partner="${p.id}">${logoIds.has(p.id)?`<img src="assets/partners/${p.id}.svg" alt="${p.name}" loading="lazy">`:`<span class="partner-wordmark ${p.style||''}">${p.name}</span>`}<small>探索灵感 ↗</small></button>`).join('');$$('.partner-logo').forEach(b=>{const p=D.partners.find(p=>p.id===b.dataset.partner);$('img',b)?.addEventListener('error',e=>{e.target.replaceWith(Object.assign(document.createElement('span'),{className:'partner-wordmark',textContent:p.name}));});b.addEventListener('click',()=>openDialog(`<article class="discussion"><span class="mono red">CULTURE & CONNECTIONS / CONCEPT WALL</span><h2 id="dialog-title">${p.name}</h2><p class="discussion-intro">从运动装备、赛场转播到日常数码，体育文化与我们的生活时刻相连。这一格记录 ${p.name} 带来的视觉灵感。</p><img class="discussion-image" src="assets/basketball.jpg" alt="篮球文化灵感"><p class="demo-note">本墙为课堂视觉研究，不代表虎扑与所展示品牌存在实际合作、授权或商业关系。</p><a href="#hot" class="button button-red" id="partner-talk">聊聊你的装备 <span>↗</span></a></article>`));});}
+  function renderPartners(){$('#partner-grid').innerHTML=D.partners.map((p,i)=>`<button class="partner-logo" style="--logo-scale:${[1.12,.85,1.2,.93,1.02][i%5]};--logo-y:${[-16,20,-6,26,-22,14,-24,18,0,24][i%10]}px" aria-label="查看${p.name}文化灵感" data-partner="${p.id}">${logoIds.has(p.id)?`<img src="assets/partners/${p.id}.svg" alt="${p.name}" loading="lazy">`:`<span class="partner-wordmark ${p.style||''}">${p.name}</span>`}<small>探索灵感 ↗</small></button>`).join('');$$('.partner-logo').forEach(b=>{const p=D.partners.find(p=>p.id===b.dataset.partner);$('img',b)?.addEventListener('error',e=>{e.target.replaceWith(Object.assign(document.createElement('span'),{className:'partner-wordmark',textContent:p.name}));});b.addEventListener('click',()=>openDialog(`<article class="discussion"><span class="mono red">CULTURE & CONNECTIONS / CONCEPT WALL</span><h2 id="dialog-title">${p.name}</h2><p class="discussion-intro">从运动装备、赛场转播到日常数码，体育文化与我们的生活时刻相连。这一格记录 ${p.name} 带来的视觉灵感。</p><img class="discussion-image" src="assets/basketball.jpg" alt="篮球文化灵感"><p class="demo-note">本墙为课堂视觉研究，不代表虎扑与所展示品牌存在实际合作、授权或商业关系。</p><a href="#hot" class="button button-red" id="partner-talk">聊聊你的装备 <span>↗</span></a></article>`));});}
   $('#dialog-content').addEventListener('click',e=>{if(e.target.closest('#partner-talk')){e.preventDefault();closeDialog();topicFilter='数码';setFilter($('#topic-filters'),'topic',topicFilter);renderTopics();goTo('#hot');}});
 
   function goTo(target,offset=85){const el=typeof target==='string'?$(target):target;if(!el)return;if(lenis)lenis.scrollTo(el,{offset:-offset,duration:1.15});else window.scrollTo({top:el.getBoundingClientRect().top+scrollY-offset,behavior:reduced?'instant':'smooth'});}
   document.addEventListener('click',e=>{const a=e.target.closest('a[href^="#"]');if(!a)return;const target=a.getAttribute('href');if(!$(target))return;e.preventDefault();goTo(target,target==='#home'?0:85);$('.header').classList.remove('menu-open');$('.menu-toggle').setAttribute('aria-expanded','false');});
   $('.menu-toggle').addEventListener('click',()=>{const active=$('.header').classList.toggle('menu-open');$('.menu-toggle').setAttribute('aria-expanded',String(active));});
 
-  function addTilt(el,amount){if(!fine||reduced)return;let frame=0;el.addEventListener('pointermove',e=>{if(frame)return;const cx=e.clientX,cy=e.clientY;frame=requestAnimationFrame(()=>{frame=0;const r=el.getBoundingClientRect();const x=(cx-r.left)/r.width,y=(cy-r.top)/r.height;el.style.setProperty('--mx',`${x*100}%`);el.style.setProperty('--my',`${y*100}%`);if(hasGSAP)gsap.to(el,{rotationX:(.5-y)*amount,rotationY:(x-.5)*amount,y:-4,duration:.4,overwrite:'auto',transformPerspective:1000});});});el.addEventListener('pointerleave',()=>{cancelAnimationFrame(frame);frame=0;if(hasGSAP)gsap.to(el,{rotationX:0,rotationY:0,y:0,duration:.7,overwrite:'auto',clearProps:'transform'});});}
+  function addTilt(el,amount,{pauseOn=null}={}) {
+    if(!fine||reduced)return;
+    let frame=0,paused=false,latest={x:0,y:0};
+    const zone=pauseOn?$(pauseOn,el):null;
+    const focused=()=>zone?.contains(document.activeElement);
+    function pause(value) {
+      if(paused===value)return;
+      paused=value;el.dataset.tiltPaused=String(value);
+      if(value){
+        cancelAnimationFrame(frame);frame=0;
+        if(hasGSAP){gsap.killTweensOf(el,'rotationX,rotationY,rotationZ,y');gsap.set(el,{rotationX:0,rotationY:0,rotationZ:0,y:0,clearProps:'transform'});}
+      }
+    }
+    // Capture runs before star preview reads geometry: hit areas stay still.
+    if(zone){
+      el.addEventListener('pointerover',e=>{if(zone.contains(e.target))pause(true);},true);
+      el.addEventListener('focusin',e=>{if(zone.contains(e.target))pause(true);});
+      el.addEventListener('focusout',()=>queueMicrotask(()=>{if(!focused()&&!zone.matches(':hover'))pause(false);}));
+    }
+    el.addEventListener('pointermove',e=>{
+      if(zone&&(zone.contains(e.target)||focused())){pause(true);return;}
+      pause(false);latest={x:e.clientX,y:e.clientY};
+      if(frame)return;
+      frame=requestAnimationFrame(()=>{
+        frame=0;if(paused)return;
+        const r=el.getBoundingClientRect(),x=(latest.x-r.left)/r.width,y=(latest.y-r.top)/r.height;
+        el.style.setProperty('--mx',`${x*100}%`);el.style.setProperty('--my',`${y*100}%`);
+        if(hasGSAP)gsap.to(el,{rotationX:(.5-y)*amount,rotationY:(x-.5)*amount,y:-4,duration:.4,overwrite:'auto',transformPerspective:1000});
+      });
+    });
+    el.addEventListener('pointerleave',()=>{
+      cancelAnimationFrame(frame);frame=0;
+      if(focused())return;
+      pause(false);
+      if(hasGSAP)gsap.to(el,{rotationX:0,rotationY:0,y:0,duration:.5,overwrite:'auto',clearProps:'transform'});
+    });
+  }
 
   // A short-lived particle canvas: no permanent render loop or external audio.
   const pc=$('#particle-canvas'),ctx=pc.getContext('2d');let particles=[],particleFrame=0;
@@ -94,79 +169,54 @@
   function burst(x,y){if(reduced)return;for(let i=0;i<40;i++){const a=Math.random()*Math.PI*2,s=2+Math.random()*6;particles.push({x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s-2,life:1,size:2+Math.random()*4,color:i%3?'#ffcf67':'#ed263a'});}if(!particleFrame)particleFrame=requestAnimationFrame(drawParticles);}
   function drawParticles(){ctx.clearRect(0,0,pc.width,pc.height);particles=particles.filter(p=>p.life>0);particles.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.vy+=.12;p.life-=.022;ctx.globalAlpha=Math.max(0,p.life);ctx.fillStyle=p.color;ctx.save();ctx.translate(p.x,p.y);ctx.rotate(p.life*5);ctx.fillRect(-p.size/2,-p.size/2,p.size,p.size);ctx.restore();});ctx.globalAlpha=1;particleFrame=particles.length?requestAnimationFrame(drawParticles):0;}
 
-  // Codrops Custom Cursors Demo 4: eight smoothed noisy segments, 30 → 75px,
-  // lerped following and a magnetic centre. SVG replaces Paper's full-screen
-  // canvas; SimplexNoise and the interaction geometry follow the reference.
-  function initMagneticCursor() {
+  // A red ring and white crosshair follow only pointer coordinates.
+  // Hover feedback never changes the pointer position.
+  function initCrosshairCursor() {
     const media=matchMedia('(min-width:1000px) and (hover:hover) and (pointer:fine)');
-    if(reduced)return;
-    const cursor=$('.cursor'),path=$('.cursor-ring'),label=$('.cursor-label');
-    const noises=Array.from({length:8},()=>window.SimplexNoise?new SimplexNoise():null);
-    const mouse={x:innerWidth/2,y:innerHeight/2};
-    const state={x:mouse.x,y:mouse.y,r:15,noise:0};
-    let target=null,visible=false,frame=0,previous=0,dirty=false;
-    const selectors='a,button,[role="button"],.player-card';
-    function hover(element) {
-      const next=element instanceof Element?element.closest(selectors):null;
-      if(next===target)return;
-      target=next;
-      const card=target?.matches('.jersey-card,.topic-card,.fan-photo,.partner-logo,.player-card,.match-card');
-      const star=target?.hasAttribute('data-star');
-      cursor.classList.toggle('active',!!target);
-      cursor.classList.toggle('is-card',!!card);
-      cursor.classList.toggle('is-star',!!star);
-      cursor.dataset.mode=star?'rating':card?'card':target?'magnetic':'follow';
-      cursor.dataset.target=target?.className||'';
-      label.textContent=star?'':card?(target.matches('.player-card,.match-card')?'评分':'查看'):'';
-    }
-    function smoothPath(points) {
-      let d=`M${points[0][0]},${points[0][1]}`;
-      for(let i=0;i<8;i++) {
-        const p0=points[(i+7)%8],p1=points[i],p2=points[(i+1)%8],p3=points[(i+2)%8];
-        d+=`C${p1[0]+(p2[0]-p0[0])/6},${p1[1]+(p2[1]-p0[1])/6} ${p2[0]-(p3[0]-p1[0])/6},${p2[1]-(p3[1]-p1[1])/6} ${p2[0]},${p2[1]}`;
-      }
-      return d+'Z';
-    }
-    function render(time) {
-      frame=0;
-      if(!media.matches||!visible||document.hidden)return;
-      const dt=Math.min(2,(time-previous)/16.667||1);previous=time;
-      if(dirty){hover(document.elementFromPoint(mouse.x,mouse.y));dirty=false;}
-      let x=mouse.x,y=mouse.y,r=15;
-      if(target?.isConnected) {
-        const box=target.getBoundingClientRect();
-        if(mouse.x<box.left||mouse.x>box.right||mouse.y<box.top||mouse.y>box.bottom)hover(null);
-        else {
-          x=box.left+box.width/2+(mouse.x-box.left-box.width/2)*.08;
-          y=box.top+box.height/2+(mouse.y-box.top-box.height/2)*.08;
-          r=target.hasAttribute('data-star')?23:target.matches('.player-card,.jersey-card,.topic-card,.fan-photo,.match-card')?47:37.5;
+    const cursor=$('.cursor'),label=$('.cursor-label');
+    const mouse={x:innerWidth/2,y:innerHeight/2},state={...mouse};
+    let visible=false,frame=0,previous=0,precision=false,dirty=false,hovered=null,labelTimer;
+    function setMode(element) {
+      const rating=element instanceof Element&&!!element.closest('.player-card,.rating-stars,[data-star]');
+      const target=!rating&&element instanceof Element?element.closest('a,button,[role="button"]'):null;
+      precision=rating;cursor.classList.toggle('is-rating',rating);
+      cursor.classList.toggle('is-hover',!!target);
+      cursor.dataset.mode=rating?'rating':target?'hover':'follow';
+      if(target!==hovered){
+        hovered=target;clearTimeout(labelTimer);cursor.classList.remove('show-label');
+        if(target?.matches('.jersey-card,.topic-card,.fan-photo,.partner-logo')){
+          label.textContent='查看';cursor.classList.add('show-label');
+          labelTimer=setTimeout(()=>cursor.classList.remove('show-label'),600);
         }
       }
-      const follow=1-Math.pow(.8,dt),grow=1-Math.pow(.84,dt);
-      state.x+=(x-state.x)*follow;state.y+=(y-state.y)*follow;
-      state.r+=(r-state.r)*grow;state.noise+=((target?4:0)-state.noise)*grow;
-      const points=Array.from({length:8},(_,i)=>{
-        const angle=i*Math.PI/4;
-        const nx=noises[i]?.noise2D(time/2500,0)??Math.sin(time/900+i*2);
-        const ny=noises[i]?.noise2D(time/2500,1)??Math.cos(time/1100+i*3);
-        return [80+Math.cos(angle)*state.r+nx*state.noise,80+Math.sin(angle)*state.r+ny*state.noise];
-      });
-      cursor.style.transform=`translate3d(${state.x}px,${state.y}px,0)`;
-      path.setAttribute('d',smoothPath(points));
-      frame=requestAnimationFrame(render);
+      if(rating){label.textContent='';cursor.classList.remove('show-label');}
+    }
+    function place(){cursor.style.transform=`translate3d(${state.x}px,${state.y}px,0)`;}
+    function render(time) {
+      frame=0;if(!media.matches||!visible||document.hidden)return;
+      const dt=Math.min(2,(time-previous)/16.667||1);previous=time;
+      if(dirty){setMode(document.elementFromPoint(mouse.x,mouse.y));dirty=false;}
+      const follow=precision||reduced?1:1-Math.pow(.65,dt);
+      state.x+=(mouse.x-state.x)*follow;state.y+=(mouse.y-state.y)*follow;
+      place();frame=requestAnimationFrame(render);
     }
     function start(){if(!frame&&media.matches&&visible&&!document.hidden)frame=requestAnimationFrame(render);}
-    function stop(){cancelAnimationFrame(frame);frame=0;cursor.style.opacity='0';}
-    function configure(){document.body.classList.toggle('magnetic-cursor',media.matches);if(media.matches)start();else stop();}
+    function stop(){cancelAnimationFrame(frame);frame=0;cursor.style.opacity='0';cursor.classList.remove('pressed');}
+    function configure(){document.body.classList.toggle('crosshair-cursor',media.matches);if(media.matches)start();else stop();}
     document.addEventListener('pointermove',e=>{
       if(e.pointerType==='touch'||!media.matches)return;
-      mouse.x=e.clientX;mouse.y=e.clientY;
-      if(!visible){state.x=mouse.x;state.y=mouse.y;visible=true;}
-      hover(e.target);cursor.style.opacity='1';start();
+      mouse.x=e.clientX;mouse.y=e.clientY;setMode(e.target);
+      if(!visible||precision){state.x=mouse.x;state.y=mouse.y;place();}
+      visible=true;cursor.style.opacity='1';start();
     },{passive:true});
-    document.addEventListener('pointerout',e=>{if(!e.relatedTarget){visible=false;hover(null);stop();}});
-    document.addEventListener('pointerdown',()=>cursor.classList.add('pressed'));
+    document.addEventListener('pointerdown',e=>{
+      if(!media.matches)return;
+      mouse.x=state.x=e.clientX;mouse.y=state.y=e.clientY;setMode(e.target);place();
+      cursor.classList.add('pressed');
+    },{passive:true});
     document.addEventListener('pointerup',()=>cursor.classList.remove('pressed'));
+    document.addEventListener('pointercancel',()=>cursor.classList.remove('pressed'));
+    document.addEventListener('pointerout',e=>{if(!e.relatedTarget){visible=false;setMode(null);stop();}});
     document.addEventListener('visibilitychange',()=>document.hidden?stop():start());
     document.addEventListener('scroll',()=>{dirty=true;},{passive:true,capture:true});
     media.addEventListener('change',configure);configure();
@@ -187,13 +237,13 @@
       .to(stage,{backgroundColor:'#26261f',duration:.4,ease:'none'},.6)
       .fromTo('.story-progress-track i',{scaleX:0},{scaleX:1,duration:1,ease:'none'},0);
     $$('.memory').forEach((el,i)=>story.fromTo(el,
-      {y:i%2?80:-55,rotation:Number(el.dataset.turn)-3,scale:i%3===0?.94:1.03},
-      {y:i%2?-65:65,rotation:Number(el.dataset.turn)+3,scale:i%3===0?1.05:.96,duration:1,ease:'none'},0));
+      {y:i%2?120:-90,rotation:Number(el.dataset.turn)-5,scale:i%3===0?.9:1.08},
+      {y:i%2?-110:90,rotation:Number(el.dataset.turn)+6,scale:i%3===0?1.1:.94,duration:1,ease:'none'},0));
     story.fromTo('.memory-quote',{y:50,rotation:3},{y:-50,rotation:-2,duration:1,ease:'none'},0);
   }
 
   function initMotion(){if(hasGSAP)gsap.registerPlugin(ScrollTrigger);if(window.Lenis&&!reduced){lenis=new Lenis({duration:1.15,smoothWheel:true,wheelMultiplier:.9,anchors:false});lenis.on('scroll',()=>{if(hasGSAP)ScrollTrigger.update();});if(hasGSAP){gsap.ticker.add(t=>lenis.raf(t*1000));gsap.ticker.lagSmoothing(0);}else{const loop=t=>{lenis.raf(t);requestAnimationFrame(loop);};requestAnimationFrame(loop);}}
-    initMagneticCursor();
+    initCrosshairCursor();
     if(hasGSAP){
       const mm=gsap.matchMedia();mm.add('(prefers-reduced-motion: no-preference)',()=>{
         const hero=gsap.timeline({scrollTrigger:{trigger:'.hero',start:'top top',end:()=>`+=${innerHeight*2.2}`,pin:'.hero-stage',scrub:1.1,anticipatePin:1,invalidateOnRefresh:true,onUpdate:self=>{$('.hero').dataset.scene=self.progress<.3?'portrait':self.progress<.65?'merge':'identity';$('.portrait-parallax').style.setProperty('--portrait-dim',String(1-self.progress*.65));$('.hero-scene').innerHTML=`0${self.progress<.3?1:self.progress<.65?2:3} <i>/</i> 03`;}}});
