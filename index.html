@@ -9,6 +9,7 @@
   <link rel="preload" as="font" href="assets/fonts/anton.ttf" type="font/ttf" crossorigin>
   <link rel="stylesheet" href="styles.css">
   <script defer src="assets/vendor/gsap.min.js"></script><script defer src="assets/vendor/ScrollTrigger.min.js"></script><script defer src="assets/vendor/lenis.min.js"></script>
+  <script defer src="assets/vendor/simplex-noise.min.js"></script>
   <script defer src="data.js"></script><script defer src="app.js"></script>
 </head>
 <body>
@@ -17,7 +18,10 @@
     <div class="loader-center"><span class="serif">For the love</span><strong>OF THE GAME.</strong></div>
     <div class="loader-bottom"><span>主场加载中</span><div class="load-track"><i></i></div><span class="load-number">00<span>%</span></span><button id="skip-loader">跳过开场 ↗</button></div>
   </div>
-  <div class="page-progress" aria-hidden="true"></div><div class="cursor" aria-hidden="true"><span>探索</span></div><div class="grain" aria-hidden="true"></div>
+  <div class="page-progress" aria-hidden="true"></div>
+  <div class="cursor" aria-hidden="true"><svg viewBox="0 0 160 160"><path class="cursor-ring" d="M95 80A15 15 0 1 1 65 80A15 15 0 1 1 95 80Z"/></svg><span class="cursor-label"></span></div>
+  <svg class="archive-defs" aria-hidden="true"><defs><clipPath id="archive-shape" clipPathUnits="objectBoundingBox"><path d="M.044 .009H.956Q.991 .009 .991 .037V.851Q.991 .882 .956 .882H.755Q.714 .882 .694 .912L.654 .963Q.635 .991 .595 .991H.044Q.009 .991 .009 .963V.037Q.009 .009 .044 .009Z"/></clipPath></defs></svg>
+  <div class="grain" aria-hidden="true"></div>
   <header class="header">
     <a href="#home" class="brand" aria-label="虎扑首页"><img src="assets/hupu-logo-red.svg" alt="虎扑官方标志" width="74" height="61"></a>
     <a href="#home" class="header-edition">HUPU COMMUNITY<span>FOR THE LOVE OF THE GAME</span></a>
@@ -30,7 +34,7 @@
         <div class="hero-contours" aria-hidden="true"><svg viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice"><g fill="none" stroke="currentColor"><path d="M-300 200Q50-180 460 150T1150 100T1800 300"/><path d="M-300 270Q50-110 460 220T1150 170T1800 370"/><path d="M-300 340Q50-40 460 290T1150 240T1800 440"/><path d="M-300 410Q50 30 460 360T1150 310T1800 510"/><path d="M-300 480Q50 100 460 430T1150 380T1800 580"/><path d="M-300 550Q50 170 460 500T1150 450T1800 650"/><path d="M-300 620Q50 240 460 570T1150 520T1800 720"/><path d="M-300 690Q50 310 460 640T1150 590T1800 790"/><path d="M-300 760Q50 380 460 710T1150 660T1800 860"/><path d="M-300 830Q50 450 460 780T1150 730T1800 930"/><path d="M-300 900Q50 520 460 850T1150 800T1800 1000"/></g></svg></div>
         <div class="hero-topline mono"><span><i class="live-dot"></i> THE HOME OF REAL FANS</span><span>VOL. 01 / A LOVE THAT NEVER STOPS</span></div>
         <h1 id="hero-title" class="hero-title"><span class="hero-home">HOME</span><span class="hero-court">COURT<span class="red">.</span></span></h1>
-        <div class="portrait-scroll"><div class="portrait-parallax"><img class="hero-portrait" src="assets/hero-portrait.webp" alt="勒布朗·詹姆斯湖人媒体日高清写真" fetchpriority="high"><canvas id="hero-canvas" aria-hidden="true"></canvas><div class="portrait-fade"></div><div class="portrait-caption mono"><span>LEBRON JAMES</span><span>THE ARCHIVE / NO.23</span></div></div></div>
+        <div class="portrait-scroll"><div class="portrait-parallax"><img class="hero-portrait" src="assets/hero-portrait.webp" alt="勒布朗·詹姆斯湖人媒体日高清写真" fetchpriority="high"><div class="portrait-fade"></div><div class="portrait-caption mono"><span>LEBRON JAMES</span><span>THE ARCHIVE / NO.23</span></div></div></div>
         <div class="hero-left"><span class="cross">✳</span><p>Some call it a game.<br>We call it <em>everything.</em></p><span class="mono muted">一场比赛，一群同路人。</span></div>
         <a href="#games" class="next-game" aria-label="为湖人对勇士的演示比赛评分"><span class="mono">FEATURED GAME <i>↗</i></span><div><img src="assets/teams/lal.svg" alt="湖人"><span>VS</span><img src="assets/teams/gsw.svg" alt="勇士"></div><span class="next-score">112 <i>—</i> 108</span><small>湖人 × 勇士 · 经典对阵演示</small><b>为本场球员评分 ↗</b></a>
         <span class="hero-script serif" aria-hidden="true">More than a game.</span>
@@ -40,8 +44,9 @@
       </div>
     </section>
     <section class="moments" id="moments" aria-labelledby="moments-title">
+      <div class="moments-stage">
       <div class="chapter-line mono"><span>01 / A COLLECTIVE OBSESSION</span><span>THE MOMENTS WE LIVE FOR</span></div>
-      <div class="moments-intro reveal"><p class="eyebrow">FROM COURTSIDE TO YOUR SIDE.</p><h2 id="moments-title">IT'S NEVER<br>JUST <span class="serif">a game.</span></h2><p class="chinese-note">总有一个瞬间，让你爱上篮球。<br>总有一群人，和你记到现在。</p></div>
+      <div class="moments-intro"><p class="eyebrow">FROM COURTSIDE TO YOUR SIDE.</p><h2 id="moments-title">IT'S NEVER<br>JUST <span class="serif">a game.</span></h2><p class="chinese-note">总有一个瞬间，让你爱上篮球。<br>总有一群人，和你记到现在。</p></div>
       <div class="memory-wall">
         <figure class="memory m1" data-drift="-170" data-turn="-7"><img src="assets/photos/lal.jpg" alt="詹姆斯在对灰熊的比赛中扣篮" loading="lazy"><figcaption><span>LOS ANGELES / THE FLIGHT</span><span>01 / 08</span></figcaption></figure>
         <figure class="memory m2" data-drift="110" data-turn="6"><img src="assets/photos/gsw.jpg" alt="库里的勇士赛场瞬间" loading="lazy"><figcaption><span>GOLDEN STATE / BELIEVE</span><span>02 / 08</span></figcaption></figure>
@@ -53,6 +58,8 @@
         <figure class="memory m7" data-drift="-100" data-turn="-5"><img src="assets/photos/chi.jpg" alt="迈克尔·乔丹公牛时代经典比赛照片" loading="lazy"><figcaption><span>CHICAGO / THE LAST DANCE</span><span>07 / 08</span></figcaption></figure>
         <figure class="memory m8" data-drift="130" data-turn="7"><img src="assets/street.jpg" alt="城市夜晚，属于每个球迷的日常" loading="lazy"><figcaption><span>AFTER THE BUZZER / REAL LIFE</span><span>08 / 08</span></figcaption></figure>
         <span class="wall-label mono">PASSION HAS NO OFF-SEASON. ↗</span>
+      </div>
+      <div class="story-progress"><span class="mono">SCROLL TO REMEMBER <i>↗</i></span><span class="story-progress-track"><i></i></span><span class="story-counter mono">01 / 08</span><a href="#jerseys">探索球衣档案 ↓</a></div>
       </div>
       <div class="moments-outro reveal"><span class="red cross">✳</span><p>DIFFERENT CITIES.<br>SAME <span class="serif">heartbeat.</span></p><a href="#jerseys" class="circle-link" aria-label="探索球衣档案">↓</a></div>
     </section>

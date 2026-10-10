@@ -67,3 +67,7 @@
 字体由Google Fonts下载：Anton、Barlow Condensed 600/700、Bodoni Moda Italic 500、Caveat 600。GSAP与ScrollTrigger3.13.0、Lenis1.3.11由jsDelivr下载。
 
 当前滚动与收藏墙结构参考 [Lando Norris官网](https://landonorris.com/)。原型备份在 `archive/`，不参与当前页面加载。
+
+## 迭代交互参考
+
+磁性噪声圆环参考 Codrops Custom Cursors Demo 4：https://tympanus.net/Tutorials/CustomCursors/index4.html 。保留八节点平滑轮廓、缓动、磁性与噪声行为，以原生 SVG 实现。SimplexNoise 2.4.0 来自 cdnjs，并保存在 assets/vendor/simplex-noise.min.js。Hero 已移除 WebGL 图像扭曲。
