@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#141412"><meta name="description" content="HUPU HOME COURT — A community built for the love of the game. 虎扑体育社区课堂概念作品。">
+  <title>HUPU — HOME COURT / 无热爱，不虎扑</title>
+  <link rel="icon" href="assets/hupu-logo-red.svg" type="image/svg+xml">
+  <link rel="preload" as="image" href="assets/hero-portrait.webp">
+  <link rel="preload" as="font" href="assets/fonts/anton.ttf" type="font/ttf" crossorigin>
+  <link rel="stylesheet" href="styles.css">
+  <script defer src="assets/vendor/gsap.min.js"></script><script defer src="assets/vendor/ScrollTrigger.min.js"></script><script defer src="assets/vendor/lenis.min.js"></script>
+  <script defer src="data.js"></script><script defer src="app.js"></script>
+</head>
+<body>
+  <div class="preloader" id="preloader" role="status" aria-label="正在载入主场">
+    <div class="loader-top"><img src="assets/hupu-logo-red.svg" alt="虎扑" width="80" height="66"><span>HOME COURT / EST. 2004</span></div>
+    <div class="loader-center"><span class="serif">For the love</span><strong>OF THE GAME.</strong></div>
+    <div class="loader-bottom"><span>主场加载中</span><div class="load-track"><i></i></div><span class="load-number">00<span>%</span></span><button id="skip-loader">跳过开场 ↗</button></div>
+  </div>
+  <div class="page-progress" aria-hidden="true"></div><div class="cursor" aria-hidden="true"><span>探索</span></div><div class="grain" aria-hidden="true"></div>
+  <header class="header">
+    <a href="#home" class="brand" aria-label="虎扑首页"><img src="assets/hupu-logo-red.svg" alt="虎扑官方标志" width="74" height="61"></a>
+    <a href="#home" class="header-edition">HUPU COMMUNITY<span>FOR THE LOVE OF THE GAME</span></a>
+    <nav aria-label="主导航"><a href="#moments">主场故事</a><a href="#jerseys">球衣档案</a><a href="#hot">今日热议</a><a href="#games">球员评分 <i>↗</i></a></nav>
+    <a class="button button-red header-cta" href="#hot">进入社区 <span>↗</span></a><button class="menu-toggle" aria-label="展开导航" aria-expanded="false"><i></i><i></i></button>
+  </header>
+  <main>
+    <section class="hero" id="home" aria-labelledby="hero-title">
+      <div class="hero-stage">
+        <div class="hero-contours" aria-hidden="true"><svg viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice"><g fill="none" stroke="currentColor"><path d="M-300 200Q50-180 460 150T1150 100T1800 300"/><path d="M-300 270Q50-110 460 220T1150 170T1800 370"/><path d="M-300 340Q50-40 460 290T1150 240T1800 440"/><path d="M-300 410Q50 30 460 360T1150 310T1800 510"/><path d="M-300 480Q50 100 460 430T1150 380T1800 580"/><path d="M-300 550Q50 170 460 500T1150 450T1800 650"/><path d="M-300 620Q50 240 460 570T1150 520T1800 720"/><path d="M-300 690Q50 310 460 640T1150 590T1800 790"/><path d="M-300 760Q50 380 460 710T1150 660T1800 860"/><path d="M-300 830Q50 450 460 780T1150 730T1800 930"/><path d="M-300 900Q50 520 460 850T1150 800T1800 1000"/></g></svg></div>
+        <div class="hero-topline mono"><span><i class="live-dot"></i> THE HOME OF REAL FANS</span><span>VOL. 01 / A LOVE THAT NEVER STOPS</span></div>
+        <h1 id="hero-title" class="hero-title"><span class="hero-home">HOME</span><span class="hero-court">COURT<span class="red">.</span></span></h1>
+        <div class="portrait-scroll"><div class="portrait-parallax"><img class="hero-portrait" src="assets/hero-portrait.webp" alt="勒布朗·詹姆斯湖人媒体日高清写真" fetchpriority="high"><canvas id="hero-canvas" aria-hidden="true"></canvas><div class="portrait-fade"></div><div class="portrait-caption mono"><span>LEBRON JAMES</span><span>THE ARCHIVE / NO.23</span></div></div></div>
+        <div class="hero-left"><span class="cross">✳</span><p>Some call it a game.<br>We call it <em>everything.</em></p><span class="mono muted">一场比赛，一群同路人。</span></div>
+        <a href="#games" class="next-game" aria-label="为湖人对勇士的演示比赛评分"><span class="mono">FEATURED GAME <i>↗</i></span><div><img src="assets/teams/lal.svg" alt="湖人"><span>VS</span><img src="assets/teams/gsw.svg" alt="勇士"></div><span class="next-score">112 <i>—</i> 108</span><small>湖人 × 勇士 · 经典对阵演示</small><b>为本场球员评分 ↗</b></a>
+        <span class="hero-script serif" aria-hidden="true">More than a game.</span>
+        <div class="hero-bottom mono"><a href="#moments" class="scroll-cue">向下滚动，进入主场 <span>↓</span></a><span class="mouse-cue">移动鼠标 · 感受赛场引力 <i>↔</i></span><span>SPORTS. CULTURE. COMMUNITY.</span></div>
+        <div class="brand-reveal" aria-hidden="true"><p class="mono">ONE GAME. MILLIONS OF VOICES.</p><div class="logo-lockup"><img class="nba-lockup" src="assets/nba.svg" alt=""><span class="collab-x">×</span><img class="hupu-lockup" src="assets/hupu-logo-red.svg" alt=""></div><h2>THIS IS<br><span class="serif">our game.</span></h2><span class="mono">无热爱，不虎扑。 / TOGETHER, WE MAKE THE GAME.</span></div>
+        <span class="hero-scene mono" aria-hidden="true">01 <i>/</i> 03</span>
+      </div>
+    </section>
+    <section class="moments" id="moments" aria-labelledby="moments-title">
+      <div class="chapter-line mono"><span>01 / A COLLECTIVE OBSESSION</span><span>THE MOMENTS WE LIVE FOR</span></div>
+      <div class="moments-intro reveal"><p class="eyebrow">FROM COURTSIDE TO YOUR SIDE.</p><h2 id="moments-title">IT'S NEVER<br>JUST <span class="serif">a game.</span></h2><p class="chinese-note">总有一个瞬间，让你爱上篮球。<br>总有一群人，和你记到现在。</p></div>
+      <div class="memory-wall">
+        <figure class="memory m1" data-drift="-170" data-turn="-7"><img src="assets/photos/lal.jpg" alt="詹姆斯在对灰熊的比赛中扣篮" loading="lazy"><figcaption><span>LOS ANGELES / THE FLIGHT</span><span>01 / 08</span></figcaption></figure>
+        <figure class="memory m2" data-drift="110" data-turn="6"><img src="assets/photos/gsw.jpg" alt="库里的勇士赛场瞬间" loading="lazy"><figcaption><span>GOLDEN STATE / BELIEVE</span><span>02 / 08</span></figcaption></figure>
+        <figure class="memory m3" data-drift="-230" data-turn="-4"><img src="assets/lebron-card.webp" alt="詹姆斯整理球衣的媒体日照片" loading="lazy"><figcaption><span>MEDIA DAY / 2023</span><span>03 / 08</span></figcaption></figure>
+        <div class="memory-quote"><span class="mono">A NOTE FROM THE COMMUNITY</span><p>We remember<br>the <span class="serif">feeling.</span><br>Not just the score.</p><span class="red-scribble" aria-hidden="true"></span><span class="mono">记住比分，也记住一起欢呼的人。<br>— EVERY JR, EVERYWHERE.</span></div>
+        <figure class="memory m4" data-drift="-140" data-turn="9"><img src="assets/photos/bos.jpg" alt="凯尔特人总决赛赛场照片" loading="lazy"><figcaption><span>BOSTON / ALL IN</span><span>04 / 08</span></figcaption></figure>
+        <figure class="memory m5" data-drift="160" data-turn="-8"><img src="assets/basketball.jpg" alt="灯光下的篮球场" loading="lazy"><figcaption><span>YOUR LOCAL COURT / 19:24</span><span>05 / 08</span></figcaption></figure>
+        <figure class="memory m6" data-drift="-200" data-turn="5"><img src="assets/photos/mem.jpg" alt="莫兰特飞身扣篮的赛场瞬间" loading="lazy"><figcaption><span>MEMPHIS / NO LIMITS</span><span>06 / 08</span></figcaption></figure>
+        <figure class="memory m7" data-drift="-100" data-turn="-5"><img src="assets/photos/chi.jpg" alt="迈克尔·乔丹公牛时代经典比赛照片" loading="lazy"><figcaption><span>CHICAGO / THE LAST DANCE</span><span>07 / 08</span></figcaption></figure>
+        <figure class="memory m8" data-drift="130" data-turn="7"><img src="assets/street.jpg" alt="城市夜晚，属于每个球迷的日常" loading="lazy"><figcaption><span>AFTER THE BUZZER / REAL LIFE</span><span>08 / 08</span></figcaption></figure>
+        <span class="wall-label mono">PASSION HAS NO OFF-SEASON. ↗</span>
+      </div>
+      <div class="moments-outro reveal"><span class="red cross">✳</span><p>DIFFERENT CITIES.<br>SAME <span class="serif">heartbeat.</span></p><a href="#jerseys" class="circle-link" aria-label="探索球衣档案">↓</a></div>
+    </section>
+    <section class="jerseys section-light" id="jerseys" aria-labelledby="jerseys-title">
+      <div class="chapter-line mono"><span>02 / THE THREADS THAT CONNECT US</span><span>16 TEAMS. ENDLESS STORIES.</span></div>
+      <div class="jersey-heading"><div class="reveal"><span class="script-label serif">Worn with pride.</span><h2 id="jerseys-title">JERSEYS<br><span>HALL OF FAME</span><i class="red">®</i></h2></div><div class="jersey-intro reveal"><span class="red cross">✳</span><p>A city. A colour. A lifetime of loyalty.<br>Every jersey has a story.<br>Find the one that feels like home.</p><span class="chinese-note">扫过球衣，重返赛场。点击，打开球队档案。</span></div></div>
+      <div class="section-toolbar"><div class="filters" id="jersey-filters" aria-label="球衣分区筛选"><button class="selected" data-conference="all" aria-pressed="true">全部球队 <small>16</small></button><button data-conference="west" aria-pressed="false">西部</button><button data-conference="east" aria-pressed="false">东部</button></div><span class="mono muted">HOVER TO REVEAL / 点击查看档案 ↗</span></div>
+      <div class="jersey-grid" id="jersey-grid"></div><div class="archive-bottom mono"><span>THE ICON ARCHIVE / HISTORIC THREADS</span><span>YOUR COLOURS. YOUR CITY. YOUR COURT.</span></div>
+    </section>
+    <section class="split-section" aria-label="赛场与社区">
+      <a class="split-panel on-court" href="#games"><img src="assets/photos/lal.jpg" alt="篮球赛场" loading="lazy"><div class="split-shade"></div><p class="mono">01 / UNDER THE LIGHTS</p><h2>ON<br><span class="serif">court.</span></h2><div><p>Every play. Every point.<br>Every opinion counts.</p><span class="round-arrow">↗</span></div><span class="split-action">看比赛 · 给球员评分</span></a>
+      <a class="split-panel in-community" href="#hot"><video muted loop playsinline preload="none" poster="assets/basketball.jpg" data-src="assets/court-highlights.mp4" aria-label="真实篮球训练短片"></video><div class="split-shade"></div><p class="mono">02 / BEYOND THE BUZZER</p><h2>IN<br><span class="serif">community.</span></h2><div><p>Real fans. Real talk.<br>This is where we belong.</p><span class="round-arrow">↗</span></div><span class="split-action">逛社区 · 找到同路人</span></a>
+    </section>
+    <section class="hot section-light" id="hot" aria-labelledby="hot-title">
+      <div class="chapter-line mono"><span>03 / THE CONVERSATION NEVER STOPS</span><span><i class="live-dot"></i> JR'S ARE TALKING</span></div>
+      <div class="section-head reveal"><h2 id="hot-title">THE TALK<br><span class="serif">of the court.</span></h2><div><p>Big moments. Bigger conversations.</p><span class="chinese-note">今天的热爱，今天聊。</span></div></div>
+      <div class="section-toolbar"><div class="filters" id="topic-filters" aria-label="今日热点分类"><button class="selected" data-topic="全部" aria-pressed="true">全部热点</button><button data-topic="篮球" aria-pressed="false">篮球</button><button data-topic="足球" aria-pressed="false">足球</button><button data-topic="数码" aria-pressed="false">数码</button><button data-topic="步行街" aria-pressed="false">步行街</button></div><button class="plain-button" id="refresh-topics">换一组 ↻</button></div>
+      <div class="hot-grid" id="hot-grid"></div><p class="demo-note">课堂概念内容 · 热度、讨论与赛程均为演示数据</p>
+    </section>
+    <section class="pulse" aria-labelledby="pulse-title"><div class="chapter-line mono"><span>THE PULSE OF A COMMUNITY</span><span>ILLUSTRATIVE COMMUNITY DATA</span></div><h2 id="pulse-title" class="reveal">ALL OF US.<br><span class="serif">All in.</span></h2><div class="stats"><div class="stat"><strong><span data-count="2864">0</span><i>+</i></strong><span class="mono">HOT THREADS / 今日热帖</span></div><div class="stat"><strong><span data-count="12.8" data-decimals="1">0</span><i>万</i></strong><span class="mono">ONLINE FANS / 在线 JR</span></div><div class="stat"><strong><span data-count="36.9" data-decimals="1">0</span><i>万</i></strong><span class="mono">CONVERSATIONS / 今日讨论</span></div></div></section>
+    <section class="games" id="games" aria-labelledby="games-title">
+      <div class="chapter-line mono"><span>04 / THE FINAL WHISTLE IS YOURS</span><span>CLASSIC MATCHUPS / DEMO EDITION</span></div>
+      <div class="games-heading reveal"><h2 id="games-title">GAME DAY.<br><span class="serif">Your say.</span></h2><div class="games-caption"><div class="display-stars" aria-hidden="true">★★★★★</div><p>The players bring the game.<br>You bring the verdict.</p><span class="chinese-note">每一颗星，都有你的态度。</span></div></div>
+      <div class="games-toolbar"><span class="mono"><i class="live-dot"></i> NBA / FEATURED MATCHUPS</span><span>选择一场比赛，开启你的球星卡 ↓</span></div>
+      <div class="match-grid" id="match-grid"></div>
+      <div class="players-panel" id="players-panel" hidden><div class="players-head"><div><span class="mono red">THE FAN VERDICT</span><h3>本场球员评分 <small id="selected-game"></small></h3></div><button class="close-panel" aria-label="收起球员评分">×</button></div><div class="rating-guide"><span>悬停亮星 · 点击评分 · 随时改分</span><span id="rating-progress" aria-live="polite">已评 0 / 4</span></div><div class="player-grid" id="player-grid"></div><p class="panel-note">评分保存在当前浏览器。数据与球衣归属采用经典对阵档案，不代表实时赛程。</p></div>
+      <div class="games-end"><span class="serif">Your voice. Your game.</span><span class="mono">NO HOT TAKES LEFT BEHIND. <i>↗</i></span></div>
+    </section>
+    <section class="partners section-light" id="partners" aria-labelledby="partners-title">
+      <div class="chapter-line mono"><span>05 / GOOD COMPANY. GREAT ENERGY.</span><span>CONCEPT COLLABORATIONS</span></div>
+      <div class="section-head reveal"><h2 id="partners-title">CULTURE<br><span class="serif">& connections.</span></h2><p>Performance meets possibility.<br>Made for a world beyond the game.</p></div><p class="demo-note partner-note">品牌文化灵感墙 · 课堂视觉演示，不表示实际合作关系</p>
+      <div class="partner-grid" id="partner-grid"></div><div class="partner-script serif" aria-hidden="true">Better together.</div>
+    </section>
+    <section class="social" id="social" aria-labelledby="social-title"><div class="chapter-line mono"><span>06 / LIFE BETWEEN THE GAMES</span><span>THE COMMUNITY EDIT</span></div><div class="social-title reveal"><p class="eyebrow">A MILLION DIFFERENT STORIES.</p><h2 id="social-title">ONE <span class="serif">community.</span></h2><a class="button button-red" href="#hot">加入讨论 <span>↗</span></a></div><div class="social-fan" id="social-fan"><button class="fan-photo" data-social="court" style="--i:-2"><img src="assets/basketball.jpg" alt="夜晚的球场" loading="lazy"><span>THE LOCAL GAME ↗</span></button><button class="fan-photo" data-social="curry" style="--i:-1"><img src="assets/photos/gsw.jpg" alt="库里赛场照片" loading="lazy"><span>BELIEVE IN THE SHOT ↗</span></button><button class="fan-photo" data-social="king" style="--i:0"><img src="assets/hero-athlete.webp" alt="詹姆斯媒体日" loading="lazy"><span>LONG LIVE THE GAME ↗</span></button><button class="fan-photo" data-social="bos" style="--i:1"><img src="assets/photos/bos.jpg" alt="凯尔特人赛场照片" loading="lazy"><span>ALL IN, TOGETHER ↗</span></button><button class="fan-photo" data-social="life" style="--i:2"><img src="assets/street.jpg" alt="城市夜景" loading="lazy"><span>BEYOND THE COURT ↗</span></button></div><div class="social-bottom mono"><span>篮球 / 足球 / 数码 / 步行街</span><span>FIND YOUR PEOPLE. KEEP YOUR PASSION.</span></div></section>
+  </main>
+  <footer class="footer"><div class="footer-top"><img src="assets/hupu-official.png" alt="虎扑官方标志" width="88" height="72"><span class="mono">EST. 2004<br>FOREVER IN THE GAME.</span><a href="#home" class="back-top">回到顶部 <span>↑</span></a></div><p class="footer-pre serif">Always bringing the passion.</p><h2>NO PASSION.<br><span>NO HUPU.</span><i>↗</i></h2><div class="footer-bottom mono"><span>© 2026 HUPU COMMUNITY CONCEPT</span><span>课堂学习作品 / 非商业 / 非官方</span><a href="#games">为热爱打分 ↗</a></div></footer>
+  <dialog class="detail-dialog" id="detail-dialog" aria-labelledby="dialog-title" data-lenis-prevent><button class="dialog-close" aria-label="关闭详情">×</button><div id="dialog-content"></div></dialog>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div><canvas class="particle-canvas" id="particle-canvas" aria-hidden="true"></canvas>
+  <noscript><div class="noscript-note">请启用 JavaScript，以体验滚动叙事、球队档案和比赛评分。</div></noscript>
+</body>
+</html>

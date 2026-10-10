@@ -1,0 +1,5 @@
+.DS_Store
+archive/
+previews/
+assets/originals/
+*.tar.gz
