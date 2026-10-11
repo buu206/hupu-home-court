@@ -32,8 +32,11 @@
     const teams=D.teams.filter(t=>conference==='all'||t.conference===conference);
     const columns=Array.from({length:Math.min(4,teams.length)},()=>[]);
     teams.forEach((t,i)=>columns[i%columns.length].push(t));
-    $('#jersey-grid').innerHTML=columns.map((items,i)=>`<div class="jersey-column" data-column="${i}">${items.map((t,j)=>`
-      <div class="jersey-slot" data-wave="${(i+j)%2===0?'up':'down'}" style="--wave-offset:${(i+j)%2===0?-50:50}px"><button class="jersey-card" data-team="${t.id}" aria-label="查看${t.cn}球衣与球队档案">
+    $('#jersey-grid').innerHTML=columns.map((items,i)=>{
+      // Each column owns an explicit up/down sequence; neighbouring columns reverse it.
+      const sequence=i%2===0?['up','down']:['down','up'];
+      return `<div class="jersey-column" data-column="${i}" data-start="${sequence[0]}">${items.map((t,j)=>`
+      <div class="jersey-slot" data-wave="${sequence[j%2]}"><button class="jersey-card" data-team="${t.id}" aria-label="查看${t.cn}球衣与球队档案">
         <span class="archive-back" aria-hidden="true"></span>
         <span class="archive-tab mono">${t.conference==='west'?'WEST':'EAST'} / THE ARCHIVE</span>
         <div class="jersey-folder">
@@ -46,8 +49,8 @@
         </div>
         <svg class="archive-outline" viewBox="0 0 320 390" preserveAspectRatio="none" aria-hidden="true"><path d="M14 3.5H306Q317 3.5 317 14.5V332Q317 344 306 344H242Q228 344 222 356L209 376Q203 386.5 190 386.5H14Q3 386.5 3 375V14.5Q3 3.5 14 3.5Z"/></svg>
         <span class="archive-number mono">NO. ${t.number} <i>↗</i></span>
-      </button></div>`).join('')}</div>`).join('');
-    $$('.jersey-card').forEach(el=>{el.addEventListener('click',()=>openTeam(el.dataset.team));addTilt(el,3);});
+      </button></div>`).join('')}</div>`;}).join('');
+    $$('.jersey-card').forEach(el=>{el.addEventListener('click',()=>openTeam(el.dataset.team));addTilt(el,2,{lift:2});});
     if(hasGSAP&&!reduced)gsap.fromTo('.jersey-card',{opacity:0,y:35},{opacity:1,y:0,duration:.65,stagger:.035,overwrite:true,clearProps:'transform'});
     refresh();
   }
@@ -69,15 +72,17 @@
   function renderMatches(){$('#match-grid').innerHTML=D.matches.map(m=>`<button class="match-card" data-match="${m.id}" aria-expanded="false" aria-controls="players-panel"><div class="match-card-top"><span>${m.label}</span><span>${m.date}</span></div><div class="match-teams"><img src="assets/teams/${m.home}.svg" alt="${team(m.home).cn}"><span>${m.score[0]}<i>:</i>${m.score[1]}</span><img src="assets/teams/${m.away}.svg" alt="${team(m.away).cn}"></div><div class="match-names"><span>${team(m.home).cn}</span><span>${team(m.away).cn}</span></div><div class="match-card-bottom"><span>为本场球员评分</span><span>↗</span></div></button>`).join('');$$('.match-card').forEach(b=>{b.addEventListener('click',()=>openMatch(b.dataset.match));addTilt(b,3);});}
   function validRating(key){const n=Number(ratings[key]);return Number.isInteger(n)&&n>=1&&n<=5?n:0;}
   function openMatch(id){selectedMatch=D.matches.find(m=>m.id===id);$$('.match-card').forEach(b=>{const active=b.dataset.match===id;b.classList.toggle('selected',active);b.setAttribute('aria-expanded',String(active));});const panel=$('#players-panel');panel.hidden=false;$('#selected-game').textContent=`${team(selectedMatch.home).cn} × ${team(selectedMatch.away).cn}`;
-    $('#player-grid').innerHTML=selectedMatch.players.map(pid=>{const p=D.players[pid];const key=`${id}:${pid}`;const value=validRating(key);return `<article class="player-card" data-player="${pid}" data-rating="${value}" style="--team-color:${p.color}"><span class="player-number" aria-hidden="true">${p.no}</span><div class="rating-stars" role="group" aria-label="为${p.name}评分">${[1,2,3,4,5].map(n=>`<button type="button" data-star="${n}" class="${n<=value?'lit':''}" aria-label="为${p.name}评${n}星" aria-pressed="${n===value}" title="${n}星 / ${n*2}分">★</button>`).join('')}</div><div class="player-status ${value?'rated':''}" aria-live="polite">${value?`✓ 已评分 ${value} 星 · ${value*2}.0 分`:'悬停亮星 · 点击评分'}</div><img class="player-photo" src="assets/${p.photo}.png" alt="${p.name}官方头像"><div class="player-info"><h4 class="player-en">${p.en}</h4><span class="community-rating">${p.score}<small>JR 演示评分</small></span><p>${p.name} / NO.${p.no}</p><div class="player-stats">${p.stats.map((n,i)=>`<span>${n}<small>${['得分','篮板','助攻'][i]}</small></span>`).join('')}</div><button class="edit-rating" type="button">${value?'修改评分 ↗':'点击上方星星评分 ↑'}</button></div><span class="card-shine"></span></article>`;}).join('');
+    $('#player-grid').innerHTML=selectedMatch.players.map(pid=>{const p=D.players[pid];const key=`${id}:${pid}`;const value=validRating(key);return `<article class="player-card" data-player="${pid}" data-rating="${value}" style="--team-color:${p.color}"><span class="player-number" aria-hidden="true">${p.no}</span><div class="rating-stars" role="group" aria-label="为${p.name}评分">${[1,2,3,4,5].map(n=>`<button type="button" data-star="${n}" class="${n<=value?'lit':''}" aria-label="为${p.name}评${n}星" aria-pressed="${n===value}" title="${n}星 / ${n*2}分">★</button>`).join('')}</div><div class="player-status ${value?'rated':''}" aria-live="polite">${value?`✓ 已评分 ${value} 星 · ${value*2}.0 分`:'悬停亮星 · 点击评分'}</div><img class="player-photo" src="assets/${p.photo}.png" alt="${p.name}官方头像"><div class="player-info"><h4 class="player-en">${p.en}</h4><span class="community-rating">${p.score}<small>JR 演示评分</small></span><p>${p.name} / NO.${p.no}</p><div class="player-stats">${p.stats.map((n,i)=>`<span>${n}<small>${['得分','篮板','助攻'][i]}</small></span>`).join('')}</div><button class="edit-rating" type="button">${value?'修改评分 ↗':'为球员评分 ↑'}</button></div><span class="card-shine"></span></article>`;}).join('');
     $$('.player-card').forEach(card=>{
       const stars=$('.rating-stars',card),buttons=$$('[data-star]',stars);
+      const tilt=addTilt(card,5,{pauseOn:'.rating-stars'});
       let pointerInside=false,hoverRating=0;
       const reset=()=>{
         const active=document.activeElement;
         previewStars(card,pointerInside?hoverRating:stars.contains(active)&&active.dataset.star?Number(active.dataset.star):Number(card.dataset.rating));
       };
       const preview=e=>{
+        tilt.pause();
         pointerInside=true;
         const box=stars.getBoundingClientRect(),unit=box.width/5;
         const local=Math.max(0,Math.min(box.width-.01,e.clientX-box.left));
@@ -108,51 +113,68 @@
       $('.edit-rating',card).addEventListener('click',()=>{
         buttons[Math.max(0,Number(card.dataset.rating)-1)].focus();toast('选择新的星数，点击即可改分');
       });
-      addTilt(card,5,{pauseOn:'.rating-stars'});
     });
     updateRatingProgress();refresh();if(hasGSAP&&!reduced){gsap.fromTo(panel,{opacity:0,y:25},{opacity:1,y:0,duration:.45});gsap.fromTo('.player-card',{y:65,rotationY:-12,rotationZ:i=>(i-1.5)*3,opacity:0},{y:0,rotationY:0,rotationZ:0,opacity:1,duration:.8,stagger:.07,ease:'power3.out',clearProps:'transform'});}requestAnimationFrame(()=>{goTo('#players-panel',110);});}
   function previewStars(card,n){$$('[data-star]',card).forEach(b=>b.classList.toggle('lit',Number(b.dataset.star)<=n));}
-  function ratePlayer(card,n,event){const key=`${selectedMatch.id}:${card.dataset.player}`;const old=validRating(key);ratings[key]=n;const persisted=save('hupu-court-ratings-v2',ratings);card.dataset.rating=n;previewStars(card,n);$$('[data-star]',card).forEach(b=>b.setAttribute('aria-pressed',String(Number(b.dataset.star)===n)));const status=$('.player-status',card);status.textContent=`✓ 已评分 ${n} 星 · ${n*2}.0 分`;status.classList.add('rated');$('.edit-rating',card).textContent='修改评分 ↗';card.classList.remove('confirmed');void card.offsetWidth;card.classList.add('confirmed');setTimeout(()=>card.classList.remove('confirmed'),350);updateRatingProgress();const r=$('.rating-stars',card).getBoundingClientRect();burst(event.clientX||r.left+r.width/2,event.clientY||r.top+r.height/2);toast(`${old?'评分已修改':'评分已确认'}：${D.players[card.dataset.player].name} ${n} 星${persisted?'':'（本次会话有效）'}`);}
+  function ratePlayer(card,n,event){const key=`${selectedMatch.id}:${card.dataset.player}`;const old=validRating(key);ratings[key]=n;const persisted=save('hupu-court-ratings-v2',ratings);card.dataset.rating=n;previewStars(card,n);$$('[data-star]',card).forEach(b=>b.setAttribute('aria-pressed',String(Number(b.dataset.star)===n)));const status=$('.player-status',card);status.textContent=`✓ 已评分 ${n} 星 · ${n*2}.0 分`;status.classList.add('rated');$('.edit-rating',card).textContent='修改评分 ↗';card.classList.remove('confirmed');void card.offsetWidth;card.classList.add('confirmed');setTimeout(()=>card.classList.remove('confirmed'),580);updateRatingProgress();const r=$('.rating-stars',card).getBoundingClientRect();burst(event.clientX||r.left+r.width/2,event.clientY||r.top+r.height/2);toast(`${old?'评分已修改':'评分已确认'}：${D.players[card.dataset.player].name} ${n} 星${persisted?'':'（本次会话有效）'}`);}
   function updateRatingProgress(){const count=selectedMatch.players.filter(id=>validRating(`${selectedMatch.id}:${id}`)).length;$('#rating-progress').textContent=`已评 ${count} / ${selectedMatch.players.length}${count===selectedMatch.players.length?' · 本场评分完成 ✓':''}`;}
   $('.close-panel').addEventListener('click',()=>{$('#players-panel').hidden=true;$$('.match-card').forEach(b=>{b.classList.remove('selected');b.setAttribute('aria-expanded','false');});selectedMatch=null;refresh();goTo('#games');});
 
   // Twenty visual culture marks, real SVGs where supplied; others use wordmarks.
   const logoIds=new Set(['nike','adidas','puma','underarmour','jordan','newbalance','redbull','sony','samsung','xiaomi','playstation','spotify','bilibili','beats','logitech','twitch']);
-  function renderPartners(){$('#partner-grid').innerHTML=D.partners.map((p,i)=>`<button class="partner-logo" style="--logo-scale:${[1.12,.85,1.2,.93,1.02][i%5]};--logo-y:${[-16,20,-6,26,-22,14,-24,18,0,24][i%10]}px" aria-label="查看${p.name}文化灵感" data-partner="${p.id}">${logoIds.has(p.id)?`<img src="assets/partners/${p.id}.svg" alt="${p.name}" loading="lazy">`:`<span class="partner-wordmark ${p.style||''}">${p.name}</span>`}<small>探索灵感 ↗</small></button>`).join('');$$('.partner-logo').forEach(b=>{const p=D.partners.find(p=>p.id===b.dataset.partner);$('img',b)?.addEventListener('error',e=>{e.target.replaceWith(Object.assign(document.createElement('span'),{className:'partner-wordmark',textContent:p.name}));});b.addEventListener('click',()=>openDialog(`<article class="discussion"><span class="mono red">CULTURE & CONNECTIONS / CONCEPT WALL</span><h2 id="dialog-title">${p.name}</h2><p class="discussion-intro">从运动装备、赛场转播到日常数码，体育文化与我们的生活时刻相连。这一格记录 ${p.name} 带来的视觉灵感。</p><img class="discussion-image" src="assets/basketball.jpg" alt="篮球文化灵感"><p class="demo-note">本墙为课堂视觉研究，不代表虎扑与所展示品牌存在实际合作、授权或商业关系。</p><a href="#hot" class="button button-red" id="partner-talk">聊聊你的装备 <span>↗</span></a></article>`));});}
+  function renderPartners(){$('#partner-grid').innerHTML=D.partners.map((p,i)=>`<button class="partner-logo" style="--logo-scale:${[1.08,.92,1.13,.96,1.02][i%5]};--logo-y:${[-12,0,14,0,-12,12,0,-14,0,12][i%10]}px" aria-label="查看${p.name}文化灵感" data-partner="${p.id}">${logoIds.has(p.id)?`<img src="assets/partners/${p.id}.svg" alt="${p.name}" loading="lazy">`:`<span class="partner-wordmark ${p.style||''}">${p.name}</span>`}<small>探索灵感 ↗</small></button>`).join('');$$('.partner-logo').forEach(b=>{const p=D.partners.find(p=>p.id===b.dataset.partner);$('img',b)?.addEventListener('error',e=>{e.target.replaceWith(Object.assign(document.createElement('span'),{className:'partner-wordmark',textContent:p.name}));});b.addEventListener('click',()=>openDialog(`<article class="discussion"><span class="mono red">CULTURE & CONNECTIONS / CONCEPT WALL</span><h2 id="dialog-title">${p.name}</h2><p class="discussion-intro">从运动装备、赛场转播到日常数码，体育文化与我们的生活时刻相连。这一格记录 ${p.name} 带来的视觉灵感。</p><img class="discussion-image" src="assets/basketball.jpg" alt="篮球文化灵感"><p class="demo-note">本墙为课堂视觉研究，不代表虎扑与所展示品牌存在实际合作、授权或商业关系。</p><a href="#hot" class="button button-red" id="partner-talk">聊聊你的装备 <span>↗</span></a></article>`));});}
   $('#dialog-content').addEventListener('click',e=>{if(e.target.closest('#partner-talk')){e.preventDefault();closeDialog();topicFilter='数码';setFilter($('#topic-filters'),'topic',topicFilter);renderTopics();goTo('#hot');}});
 
   function goTo(target,offset=85){const el=typeof target==='string'?$(target):target;if(!el)return;if(lenis)lenis.scrollTo(el,{offset:-offset,duration:1.15});else window.scrollTo({top:el.getBoundingClientRect().top+scrollY-offset,behavior:reduced?'instant':'smooth'});}
   document.addEventListener('click',e=>{const a=e.target.closest('a[href^="#"]');if(!a)return;const target=a.getAttribute('href');if(!$(target))return;e.preventDefault();goTo(target,target==='#home'?0:85);$('.header').classList.remove('menu-open');$('.menu-toggle').setAttribute('aria-expanded','false');});
   $('.menu-toggle').addEventListener('click',()=>{const active=$('.header').classList.toggle('menu-open');$('.menu-toggle').setAttribute('aria-expanded',String(active));});
 
-  function addTilt(el,amount,{pauseOn=null}={}) {
-    if(!fine||reduced)return;
+  function addTilt(el,amount,{pauseOn=null,lift=4}={}) {
+    const noop={pause:()=>{}};
+    if(!fine||reduced)return noop;
     let frame=0,paused=false,latest={x:0,y:0};
     const zone=pauseOn?$(pauseOn,el):null;
-    const focused=()=>zone?.contains(document.activeElement);
-    function pause(value) {
+    const focused=()=>!!zone?.contains(document.activeElement);
+    const transformProps='x,y,z,rotation,rotationX,rotationY,rotationZ,scale,scaleX,scaleY,skewX,skewY,transformPerspective';
+    function pause(value=true) {
       if(paused===value)return;
       paused=value;el.dataset.tiltPaused=String(value);
-      if(value){
-        cancelAnimationFrame(frame);frame=0;
-        if(hasGSAP){gsap.killTweensOf(el,'rotationX,rotationY,rotationZ,y');gsap.set(el,{rotationX:0,rotationY:0,rotationZ:0,y:0,clearProps:'transform'});}
+      if(!value)return;
+      cancelAnimationFrame(frame);frame=0;
+      // Kill every transform channel, including perspective and entry animation.
+      // Opacity can finish independently. CSS also locks the whole card to none.
+      if(hasGSAP){
+        gsap.killTweensOf(el,transformProps);
+        gsap.set(el,{x:0,y:0,z:0,rotation:0,rotationX:0,rotationY:0,rotationZ:0,
+          scale:1,skewX:0,skewY:0,transformPerspective:0,clearProps:'transform'});
       }
     }
-    // Capture runs before star preview reads geometry: hit areas stay still.
+    function inZone(event) {
+      if(!zone)return false;
+      if(zone.contains(event.target)||focused())return true;
+      // A small guard band prevents a reset from moving a star out from under the pointer.
+      const r=zone.getBoundingClientRect();
+      return event.clientX>=r.left-6&&event.clientX<=r.right+6&&
+        event.clientY>=r.top-8&&event.clientY<=r.bottom+8;
+    }
     if(zone){
-      el.addEventListener('pointerover',e=>{if(zone.contains(e.target))pause(true);},true);
-      el.addEventListener('focusin',e=>{if(zone.contains(e.target))pause(true);});
-      el.addEventListener('focusout',()=>queueMicrotask(()=>{if(!focused()&&!zone.matches(':hover'))pause(false);}));
+      el.addEventListener('pointerover',e=>{if(inZone(e))pause();},true);
+      zone.addEventListener('pointerenter',()=>pause());
+      el.addEventListener('focusin',e=>{if(zone.contains(e.target))pause();});
+      el.addEventListener('focusout',()=>queueMicrotask(()=>{
+        if(!focused()&&!zone.matches(':hover'))pause(false);
+      }));
     }
     el.addEventListener('pointermove',e=>{
-      if(zone&&(zone.contains(e.target)||focused())){pause(true);return;}
+      if(inZone(e)){pause();return;}
       pause(false);latest={x:e.clientX,y:e.clientY};
       if(frame)return;
       frame=requestAnimationFrame(()=>{
-        frame=0;if(paused)return;
+        frame=0;if(paused||focused()||zone?.matches(':hover'))return;
         const r=el.getBoundingClientRect(),x=(latest.x-r.left)/r.width,y=(latest.y-r.top)/r.height;
         el.style.setProperty('--mx',`${x*100}%`);el.style.setProperty('--my',`${y*100}%`);
-        if(hasGSAP)gsap.to(el,{rotationX:(.5-y)*amount,rotationY:(x-.5)*amount,y:-4,duration:.4,overwrite:'auto',transformPerspective:1000});
+        if(hasGSAP)gsap.to(el,{rotationX:(.5-y)*amount,rotationY:(x-.5)*amount,
+          y:-lift,duration:.4,overwrite:'auto',transformPerspective:1000});
       });
     });
     el.addEventListener('pointerleave',()=>{
@@ -161,6 +183,7 @@
       pause(false);
       if(hasGSAP)gsap.to(el,{rotationX:0,rotationY:0,y:0,duration:.5,overwrite:'auto',clearProps:'transform'});
     });
+    return {pause:()=>pause(true)};
   }
 
   // A short-lived particle canvas: no permanent render loop or external audio.
@@ -232,13 +255,14 @@
     }});
     story.to(track,{x:()=>-distance(),duration:1,ease:'none'},0)
       .to('.moments-intro',{x:()=>-innerWidth*.85,opacity:0,duration:.28,ease:'none'},0)
-      .to(stage,{backgroundColor:'#bcb8a5',duration:.28,ease:'none'},0)
-      .to(stage,{backgroundColor:'#8c3934',color:'#efeee5',duration:.32,ease:'none'},.28)
-      .to(stage,{backgroundColor:'#26261f',duration:.4,ease:'none'},.6)
+      .to(stage,{backgroundColor:'#d5c6a3',duration:.16,ease:'sine.inOut'},0)
+      .to(stage,{backgroundColor:'#b54236',color:'#fff4e3',duration:.10,ease:'sine.inOut'},.25)
+      .to(stage,{backgroundColor:'#472725',duration:.10,ease:'sine.inOut'},.52)
+      .to(stage,{backgroundColor:'#20201b',duration:.12,ease:'sine.inOut'},.78)
       .fromTo('.story-progress-track i',{scaleX:0},{scaleX:1,duration:1,ease:'none'},0);
     $$('.memory').forEach((el,i)=>story.fromTo(el,
-      {y:i%2?120:-90,rotation:Number(el.dataset.turn)-5,scale:i%3===0?.9:1.08},
-      {y:i%2?-110:90,rotation:Number(el.dataset.turn)+6,scale:i%3===0?1.1:.94,duration:1,ease:'none'},0));
+      {y:i%2?140:-100,rotation:Number(el.dataset.turn)-5,scale:i%3===0?.88:1.1},
+      {y:i%2?-130:100,rotation:Number(el.dataset.turn)+6,scale:i%3===0?1.12:.92,duration:1,ease:'none'},0));
     story.fromTo('.memory-quote',{y:50,rotation:3},{y:-50,rotation:-2,duration:1,ease:'none'},0);
   }
 
