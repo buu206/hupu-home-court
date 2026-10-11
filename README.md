@@ -89,3 +89,9 @@ ASSETS.md               媒资来源、用途与处理说明
 - 仅修正球衣墙间距和光标描边：波浪改为布局占位，up 的 margin-top 为 0，down 为 40px；行距 96px、列距 18px，首尾加入保护留白。球衣卡取消 tilt、位移入场和背板悬停位移，照片揭示保留。
 - 光标仅保留 1.8px 红圈与 1.5px 白十字，删除深色外描边与文字阴影；mix-blend-mode: difference 保证浅底对比。无磁吸，评分区保持 1 倍。
 - 1440×900 桌面验收：16 张卡片含页签/背板的最小同列净空约 70px；悬停卡片 transform 为 none；星区悬停时球员卡静止、光标 scale 为 1。
+
+## GitHub Pages
+
+`.github/workflows/pages.yml` 发布已验收的 `dist/` 静态目录。仓库 Settings → Pages 的 Source 选择 GitHub Actions 后，推送 `main` 或手动运行 Deploy GitHub Pages 即可部署。静态资源使用相对路径，支持项目子目录。
+
+后续修改根目录源码后，将变更同步至 `dist/`，再提交并推送。无需安装依赖或构建。
