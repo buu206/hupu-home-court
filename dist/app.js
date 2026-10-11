@@ -50,8 +50,9 @@
         <svg class="archive-outline" viewBox="0 0 320 390" preserveAspectRatio="none" aria-hidden="true"><path d="M14 3.5H306Q317 3.5 317 14.5V332Q317 344 306 344H242Q228 344 222 356L209 376Q203 386.5 190 386.5H14Q3 386.5 3 375V14.5Q3 3.5 14 3.5Z"/></svg>
         <span class="archive-number mono">NO. ${t.number} <i>↗</i></span>
       </button></div>`).join('')}</div>`;}).join('');
-    $$('.jersey-card').forEach(el=>{el.addEventListener('click',()=>openTeam(el.dataset.team));addTilt(el,2,{lift:2});});
-    if(hasGSAP&&!reduced)gsap.fromTo('.jersey-card',{opacity:0,y:35},{opacity:1,y:0,duration:.65,stagger:.035,overwrite:true,clearProps:'transform'});
+    $$('.jersey-card').forEach(el=>el.addEventListener('click',()=>openTeam(el.dataset.team)));
+    // Keep archive bounds fixed during reveal and filtering; the wave belongs to layout.
+    if(hasGSAP&&!reduced)gsap.fromTo('.jersey-card',{opacity:0},{opacity:1,duration:.65,stagger:.035,overwrite:true});
     refresh();
   }
   function openTeam(id){const t=team(id);openDialog(`<article class="team-detail"><div class="detail-image"><img src="assets/jerseys/${id}.jpg" alt="${t.cn}真实球衣摄影"></div><div class="detail-copy"><img src="assets/teams/${id}.svg" alt="${t.cn}队徽"><span class="mono red">THE JERSEY ARCHIVE / ${t.conference==='west'?'WESTERN':'EASTERN'} CONFERENCE</span><h2 id="dialog-title">${t.name}</h2><span class="serif">${t.quote}</span><p>${t.story}</p><div class="team-detail-info"><span><b>${t.number}</b>${t.player}</span><span><b>${id.toUpperCase()}</b>${t.city}</span></div><button class="button button-red" id="team-discussion">进入篮球讨论 <span>↗</span></button><p class="demo-note">历史球衣与赛场档案 · 课堂概念展示</p></div></article>`);$('#team-discussion').addEventListener('click',()=>{closeDialog();topicFilter='篮球';setFilter($('#topic-filters'),'topic',topicFilter);renderTopics();goTo('#hot');});}
